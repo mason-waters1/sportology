@@ -1,4 +1,3 @@
-<script>
 const urlParams = new URLSearchParams(window.location.search);
 const teamId = urlParams.get('id');
 fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_programs/${teamId}`)
@@ -28,4 +27,3 @@ fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_prog
       .catch(error => console.error(error));
   })
   .catch(error => console.error(error));
-</script>
