@@ -1,10 +1,18 @@
+<script>
+// This first script gets the program banner info
+// retrieve the URL parameter "id" to determine which team's data to retrieve
 const urlParams = new URLSearchParams(window.location.search);
 const teamId = urlParams.get('id');
+
+// retrieve the data from the Xano API endpoint
 fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_programs/${teamId}`)
   .then(response => response.json())
   .then(data => {
+    // populate the programName field
     const programName = data.programName;
     document.querySelector('#programInfo h1').textContent = programName;
+
+    // populate the city, state, and region fields
     const city = data.city;
     const state = data.state;
     const region = data.region;
@@ -15,6 +23,7 @@ fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_prog
     const hudlLink = newRecruitCard.querySelector('#SAHUDLLink');
     hudlLink.href = `${recruit.hudlHandle}`;
 
+    // populate the team banner image
     const teamBannerUrl = data.teamBanner;
     fetch(teamBannerUrl)
       .then(response => response.blob())
@@ -27,3 +36,136 @@ fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_prog
       .catch(error => console.error(error));
   })
   .catch(error => console.error(error));
+</script>
+<script>
+// get the URL parameter
+const coachUrlParams = new URLSearchParams(window.location.search);
+const coachId = coachUrlParams.get('id');
+
+// make API call to Xano
+fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_coaches?high_school_football_programs_id=${coachId}`)
+  .then(response => response.json())
+  .then(data => {
+    // get the original prepCoachBlock and hide it
+    const prepCoachBlock = document.getElementById('prepCoachBlock');
+    prepCoachBlock.style.display = 'none';
+
+    // get the coaches container
+    const coachesContainer = document.getElementById('coachesContainer');
+
+    // clone the prepCoachBlock for each coach object
+    for (let i = 0; i < data.length; i++) {
+      const coach = data[i];
+      const clonedBlock = prepCoachBlock.cloneNode(true);
+      clonedBlock.style.display = 'flex';
+      coachesContainer.appendChild(clonedBlock);
+
+      // populate the coach data in the cloned block
+      clonedBlock.querySelector('#firstName').textContent = coach.firstName;
+      clonedBlock.querySelector('#lastName').textContent = coach.lastName;
+      clonedBlock.querySelector('#coachPosition').textContent = coach.coachPosition;
+      clonedBlock.querySelector('#email').textContent = coach.email;
+      clonedBlock.querySelector('#phone').textContent = coach.phone;
+      clonedBlock.querySelector('#coachNotes').textContent = coach.coachNotes;
+      clonedBlock.querySelector('#photo').src = coach.photo;    }
+  })
+  .catch(error => {
+    console.error('Error fetching data from Xano API:', error);
+  });
+</script>
+
+<script>
+// Get the ID from the URL parameter
+const recruit24UrlParams = new URLSearchParams(window.location.search);
+const id = recruit24UrlParams.get('id');
+
+// Make the API call
+fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/highschoolfootballrecruits?high_school_football_program_id=${id}`)
+  .then(response => response.json())
+  .then(data => {
+    // Filter for objects with class = 2024
+    const recruits = data.filter(obj => obj.class === '2024');
+
+    // Loop through the filtered data and create a recruitCard for each object
+    recruits.forEach(recruit => {
+      const originalRecruitCard = document.getElementById('recruitCard');
+      const newRecruitCard = originalRecruitCard.cloneNode(true);
+      newRecruitCard.id = '';
+
+      const firstName = newRecruitCard.querySelector('#SAfirstName');
+      firstName.textContent = recruit.firstName;
+
+      const lastName = newRecruitCard.querySelector('#SAlastName');
+      lastName.textContent = recruit.lastName;
+      
+      const height = newRecruitCard.querySelector('#height');
+      height.textContent = recruit.height; 
+      
+      const weight = newRecruitCard.querySelector('#weight');
+      weight.textContent = recruit.weight;
+      
+      const position = newRecruitCard.querySelector('#position');
+      position.textContent = recruit.position;
+      
+      const GPA = newRecruitCard.querySelector('#GPA');
+			GPA.textContent = recruit.GPA;
+
+      const SAT = newRecruitCard.querySelector('#SAT');
+      SAT.textContent = recruit.SAT;
+
+      const ACT = newRecruitCard.querySelector('#ACT');
+      ACT.textContent = recruit.ACT;
+      
+      const stats2024 = newRecruitCard.querySelector('#stats2022');
+      stats2022.textContent = recruit.stats2022;
+      
+      const offers = newRecruitCard.querySelector('#offers');
+      offers.textContent = recruit.offers;
+
+      const suggestedLevel = newRecruitCard.querySelector('#suggestedLevel');
+      suggestedLevel.textContent = recruit.suggestedLevel;
+
+      const benchPress = newRecruitCard.querySelector('#benchPress');
+      benchPress.textContent = recruit.benchPress;
+
+      const powerClean = newRecruitCard.querySelector('#powerClean');
+      powerClean.textContent = recruit.powerClean;
+
+      const squat = newRecruitCard.querySelector('#squat');
+      squat.textContent = recruit.squat;     
+      
+      const hudlLink = newRecruitCard.querySelector('#SAHUDLLink');
+      hudlLink.removeAttribute('href');
+      if (!recruit.hudlHandle.startsWith("https://")) {
+  		recruit.hudlHandle = "https://" + recruit.hudlHandle;
+			}
+      hudlLink.setAttribute('href', recruit.hudlHandle);
+      
+      const youtubeLink = newRecruitCard.querySelector('#SAYouTubeLink');
+      youtubeLink.removeAttribute('href');
+
+      if (!recruit.youtubeHandle.startsWith("https://")) {
+        recruit.youtubeHandle = "https://" + recruit.youtubeHandle;
+      }
+
+      youtubeLink.setAttribute('href', recruit.youtubeHandle);
+      
+      const twitterLink = newRecruitCard.querySelector('#SATwitterLink');
+      const twitterHandle = recruit.twitterHandle;
+      const twitterUrl = `https://twitter.com/${twitterHandle}`;
+      twitterLink.setAttribute('href', twitterUrl);
+      
+      const instagramLink = newRecruitCard.querySelector('#SAInstagramLink');
+      const instagramHandle = recruit.instagramHandle;
+      const instagramUrl = `https://instagram.com/${instagramHandle}`;
+      instagramLink.setAttribute('href', instagramUrl);
+      
+      document.getElementById('2024recruits').appendChild(newRecruitCard);
+    });
+
+    // Hide the original recruitCard template
+    const originalRecruitCard = document.getElementById('recruitCard');
+    originalRecruitCard.style.display = 'none';
+  })
+  .catch(error => console.error(error));
+</script>
