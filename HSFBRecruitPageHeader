@@ -1,13 +1,18 @@
 <script>
+// This first script gets the program banner info
+// retrieve the URL parameter "id" to determine which team's data to retrieve
 const urlParams = new URLSearchParams(window.location.search);
 const teamId = urlParams.get('id');
 
+// retrieve the data from the Xano API endpoint
 fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_programs/${teamId}`)
   .then(response => response.json())
   .then(data => {
+    // populate the programName field
     const programName = data.programName;
     document.querySelector('#programInfo h1').textContent = programName;
 
+    // populate the city, state, and region fields
     const city = data.city;
     const state = data.state;
     const region = data.region;
@@ -15,22 +20,18 @@ fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_prog
     document.querySelector('#programCityStateRegion #state').textContent = state;
     document.querySelector('#programCityStateRegion #region').textContent = region;
 
+    // populate the HUDL and twitter links
     const HUDLLink = data.HUDLLink;
     const twitterLink = data.twitterLink;
     document.querySelector('#HUDLLink').href = HUDLLink;
     document.querySelector('#twitterLink').href = twitterLink;
-
-    const teamBannerUrl = data.teamBanner;
-    fetch(teamBannerUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        const objectUrl = URL.createObjectURL(blob);
-        const img = document.createElement('img');
-        img.src = objectUrl;
-        document.querySelector('#teamBanner').replaceWith(img);
-      })
-      .catch(error => console.error(error));
+    
+    var teamBannerURL = data.teamBannerURL
+    var bannerPhotoDiv = document.getElementById("bannerPhotoDiv");
+    var imgElement = bannerPhotoDiv.getElementsByTagName("img")[0];
+    imgElement.src = teamBannerURL;
   })
-  .catch(error => console.error(error));
+  .catch(error => {
+    console.error('Error fetching data from Xano API:', error);
+  });
 </script>
-<script>
