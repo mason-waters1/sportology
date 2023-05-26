@@ -1,0 +1,19 @@
+const recruit24UrlParams = new URLSearchParams(window.location.search);
+const id = parseInt(recruit24UrlParams.get('id'));
+
+fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/highschoolfootballrecruits?high_school_football_program_id=${id}`)
+  .then(response => response.json())
+  .then(data => {
+    const recruits = data.filter(obj => obj.programID === id);
+
+    recruits.forEach(recruit => {
+      const originalRecruitCard = document.getElementById('recruitCard');
+      const newRecruitCard = originalRecruitCard.cloneNode(true);
+      newRecruitCard.id = '';
+
+      const firstName = newRecruitCard.querySelector('#SAfirstName');
+      firstName.textContent = recruit.firstName;
+      
+      // ...rest of populating div's
+      
+      
