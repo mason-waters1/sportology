@@ -1,171 +1,131 @@
-// works May 24 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <script>
-// This first script gets the program banner info
-// retrieve the URL parameter "id" to determine which team's data to retrieve
-const urlParams = new URLSearchParams(window.location.search);
-const teamId = urlParams.get('id');
+  const urlParams = new URLSearchParams(window.location.search);
+  const programID = urlParams.get('id');
 
-// retrieve the data from the Xano API endpoint
-fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_programs/${teamId}`)
-  .then(response => response.json())
-  .then(data => {
-    // populate the programName field
-    const programName = data.programName;
-    document.querySelector('#programInfo h1').textContent = programName;
+  const apiEndpoint1 = `https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_programs?programID=${programID}`;
+  const apiEndpoint2 = `https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/highschoolfootballrecruits?programID=${programID}`;
+  const apiEndpoint3 = `https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_coaches?programID=${programID}`;
+  const apiEndpoint4 = `https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/hsfbalumni?programID=${programID}`;
+  const apiEndpoint5 = `https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/games?homeTeam=${programID}&awayTeam=${programID}`;
 
-    // populate the city, state, and region fields
-    const city = data.city;
-    const state = data.state;
-    const region = data.region;
-    document.querySelector('#programCityStateRegion #city').textContent = city;
-    document.querySelector('#programCityStateRegion #state').textContent = state;
-    document.querySelector('#programCityStateRegion #region').textContent = region;
+  const requests = [
+    axios.get(apiEndpoint1),
+    axios.get(apiEndpoint2),
+    axios.get(apiEndpoint3),
+    axios.get(apiEndpoint4),
+    axios.get(apiEndpoint5)
+  ];
+Promise.all(requests)
+  .then(responses => {
+    const [response1, response2, response3, response4, response5] = responses;
 
-    // populate the HUDL and twitter links
-    const HUDLLink = data.HUDLLink;
-    const twitterLink = data.twitterLink;
-    document.querySelector('#HUDLLink').href = HUDLLink;
-    document.querySelector('#twitterLink').href = twitterLink;
-    
-    var teamBannerURL = data.teamBannerURL
-    var bannerPhotoDiv = document.getElementById("bannerPhotoDiv");
-    var imgElement = bannerPhotoDiv.getElementsByTagName("img")[0];
-    imgElement.src = teamBannerURL;
-  })
-  .catch(error => {
-    console.error('Error fetching data from Xano API:', error);
-  });
-</script>
-<script>
-// get the URL parameter
-const coachUrlParams = new URLSearchParams(window.location.search);
-const coachId = coachUrlParams.get('id');
+    // Extract relevant data from responses
+    const programName = response1.data[0]?.programName || 'No data found';
+    const programCity = response1.data[0]?.city || 'No data found';
+    const programState = response1.data[0]?.state || 'No data found';
+    const programRegion = response1.data[0]?.region || 'No data found';
+    const teamHUDLLink = response1.data[0]?.HUDLLink || '#';
+    const heightAttribute = response2.data[0]?.height || 'No data found';
+    const coachData = response3.data; // Array of coach objects
+    const collegeLink = response4.data[0]?.collegeLink || 'No data found';
+    const gameDateAttribute = response5.data[0]?.date || 'No game scheduled';
+    const programTwitterLink = response1.data[0]?.twitterLink || '#';
+    const teamBannerURL = response1.data[0]?.teamBannerURL || 'No data found';
+    const coachPhotoURL = response3.data[0]?.coachPhotoURL || 'No data found';
+    const SAfirstName = response2.data[0]?.firstName || 'No data found';
+    const SAlastName = response2.data[0]?.lastName || 'No data found';
+    const position = response2.data[0]?.position || 'No data found';
+    const height = response2.data[0]?.height || 'No data found';
+    const weight = response2.data[0]?.weight || 'No data found';
+    const GPA = response2.data[0]?.GPA || 'No data found';
+    const SAT = response2.data[0]?.SAT || 'No data found';
+    const ACT = response2.data[0]?.ACT || 'No data found';
+    const offers = response2.data[0]?.offers || 'No data found';
+    const recommendedLevel = response2.data[0]?.suggestedLevel || 'No data found';
+    const benchPress = response2.data[0]?.benchPress || 'No data found';
+    const powerClean = response2.data[0]?.powerClean || 'No data found';
+    const squat = response2.data[0]?.squat || 'No data found';
+    const f40time = response2.data[0]?.f40time || 'No data found';
+    const stats2022 = response2.data[0]?.stats2022 || 'No data found';   
+    const SAHudlLink = response2.data[0]?.hudlHandle || 'No data found';   
+    const SAtwitterHandle = response2.data[0]?.twitterHandle || 'No data found';   
+    const SAInstagramHandle = response2.data[0]?.instagramHandle || 'No data found';   
+    const SAYouTube = response2.data[0]?.youtube || 'No data found';   
 
-// make API call to Xano with the filtered query parameter
-fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/high_school_football_coaches?high_school_football_programs_id=${coachId}`)
-  .then(response => response.json())
-  .then(data => {
-    // get the original prepCoachBlock and hide it
-    const prepCoachBlock = document.getElementById('prepCoachBlock');
-    prepCoachBlock.style.display = 'none';
+    // Populate program-related data in HTML elements
+    document.getElementById('programName').textContent = programName;
+    document.getElementById('city').textContent = programCity;
+    document.getElementById('state').textContent = programState;
+    document.getElementById('region').textContent = programRegion;
+    document.getElementById('HUDLLink').href = teamHUDLLink;
+    document.getElementById('twitterLink').href = programTwitterLink;
+    document.getElementById('height').textContent = heightAttribute;
+    document.getElementById('collegeLink').href = collegeLink;
+    document.getElementById('date').textContent = gameDateAttribute;
+    document.getElementById('teamBanner').src = teamBannerURL;
+    document.getElementById('coachPhoto').src = coachPhotoURL;
+    document.getElementById('SAfirstName').textContent = SAfirstName;
+    document.getElementById('SAlastName').textContent = SAlastName;
+    document.getElementById('position').textContent = position;
+    document.getElementById('weight').textContent = weight;
+    document.getElementById('recommendedLevel').textContent = recommendedLevel;
+    document.getElementById('GPA').textContent = GPA;
+    document.getElementById('SAT').textContent = SAT;
+    document.getElementById('ACT').textContent = ACT;
+    document.getElementById('squat').textContent = squat;
+    document.getElementById('powerClean').textContent = powerClean;
+    document.getElementById('benchPress').textContent = benchPress;
+    document.getElementById('f40time').textContent = f40time;
+    document.getElementById('offers').textContent = offers;
+    document.getElementById('SAHUDLLink').href = "https://" + SAHudlLink;
+    document.getElementById('SATwitterLink').href = "https://twitter.com/" + SAtwitterHandle;
+    document.getElementById('SAInstagramLink').href = "https://instagram.com/" + SAInstagramHandle;
+    document.getElementById('SAYouTubeLink').href = "https://" + SAYouTube;
 
-    // get the coaches container
+// Function to generate the coach HTML block
+    const generateCoachHTML = (coach) => {
+      return `
+        <div class="prepcoachblock">
+          <div class="div-block-495">
+            <img class="coachphoto" loading="lazy" src="${coach.coachPhotoURL || 'https://uploads-ssl.webflow.com/63a329effbb2db3f82d3a9a0/6426070e9db77e6b8fc9156e_People.png'}" alt="Coach Photo">
+            <div class="div-block-496">
+              <div class="div-block-594">
+                <p class="paragraph-202">${coach.firstName || 'First'}</p>
+                <p class="paragraph-202">${coach.lastName || 'Last'}</p>
+              </div>
+              <p class="paragraph-203">${coach.coachPosition || 'Head Coach'}</p>
+              <div class="div-block-607">
+                <p class="paragraph-270">Contact Info</p>
+                <a href="${coach.email || '#'}" class="link-436">${coach.email || 'No email found'}</a>
+                <a href="${coach.phone || '#'}" class="link-437">${coach.phone || 'No phone found'}</a>
+              </div>
+              </div>
+					<div class="div-block-497">
+              <div id="coachNote" class="coachNotesHead">
+                <h1 class="coachnotesheader">Coach Notes</h1>
+                <p id="coachNotes" class="coachnotesstyle">${coach.coachNotes || 'No notes found'}</p>
+              </div>
+          </div>
+        </div>
+      `;
+    };
+
     const coachesContainer = document.getElementById('coachesContainer');
 
-    // clone the prepCoachBlock for each coach object that matches the parameter
-    const filteredCoaches = data.filter(coach => coach.high_school_football_programs_id == coachId);
-    for (let i = 0; i < filteredCoaches.length; i++) {
-      const coach = filteredCoaches[i];
-      const clonedBlock = prepCoachBlock.cloneNode(true);
-      clonedBlock.style.display = 'flex';
-      coachesContainer.appendChild(clonedBlock);
-
-      // populate the coach data in the cloned block
-      clonedBlock.querySelector('#firstName').textContent = coach.firstName;
-      clonedBlock.querySelector('#lastName').textContent = coach.lastName;
-      clonedBlock.querySelector('#coachPosition').textContent = coach.coachPosition;
-      clonedBlock.querySelector('#email').textContent = coach.email;
-      clonedBlock.querySelector('#phone').textContent = coach.phone;
-      clonedBlock.querySelector('#coachNotes').textContent = coach.coachNotes;
-      clonedBlock.querySelector('#coachPhoto').src = coach.coachPhotoURL;
-    }
-  })
-  .catch(error => {
-    console.error('Error fetching data from Xano API:', error);
-  });
-</script>
-<script>
-// Get the ID from the URL parameter
-const recruit24UrlParams = new URLSearchParams(window.location.search);
-const id = recruit24UrlParams.get('id');
-
-// Make the API call
-fetch(`https://xcrq-vvid-zxzg.n7c.xano.io/api:7q-Aa9wu/highschoolfootballrecruits?high_school_football_program_id=${id}`)
-  .then(response => response.json())
-  .then(data => {
-    // Filter for objects with class = 2024
-    const recruits = data.filter(obj => obj.class === '2024');
-
-    // Loop through the filtered data and create a recruitCard for each object
-    recruits.forEach(recruit => {
-      const originalRecruitCard = document.getElementById('recruitCard');
-      const newRecruitCard = originalRecruitCard.cloneNode(true);
-      newRecruitCard.id = '';
-
-      const firstName = newRecruitCard.querySelector('#SAfirstName');
-      firstName.textContent = recruit.firstName;
-
-      const lastName = newRecruitCard.querySelector('#SAlastName');
-      lastName.textContent = recruit.lastName;
-      
-      const height = newRecruitCard.querySelector('#height');
-      height.textContent = recruit.height; 
-      
-      const weight = newRecruitCard.querySelector('#weight');
-      weight.textContent = recruit.weight;
-      
-      const position = newRecruitCard.querySelector('#position');
-      position.textContent = recruit.position;
-      
-      const GPA = newRecruitCard.querySelector('#GPA');
-			GPA.textContent = recruit.GPA;
-
-      const SAT = newRecruitCard.querySelector('#SAT');
-      SAT.textContent = recruit.SAT;
-
-      const ACT = newRecruitCard.querySelector('#ACT');
-      ACT.textContent = recruit.ACT;
-      
-      const stats2024 = newRecruitCard.querySelector('#stats2022');
-      stats2022.textContent = recruit.stats2022;
-      
-      const offers = newRecruitCard.querySelector('#offers');
-      offers.textContent = recruit.offers;
-
-      const suggestedLevel = newRecruitCard.querySelector('#suggestedLevel');
-      suggestedLevel.textContent = recruit.suggestedLevel;
-
-      const benchPress = newRecruitCard.querySelector('#benchPress');
-      benchPress.textContent = recruit.benchPress;
-
-      const powerClean = newRecruitCard.querySelector('#powerClean');
-      powerClean.textContent = recruit.powerClean;
-
-      const squat = newRecruitCard.querySelector('#squat');
-      squat.textContent = recruit.squat;     
-      
-      const hudlLink = newRecruitCard.querySelector('#SAHUDLLink');
-      hudlLink.removeAttribute('href');
-      if (!recruit.hudlHandle.startsWith("https://")) {
-  		recruit.hudlHandle = "https://" + recruit.hudlHandle;
-			}
-      hudlLink.setAttribute('href', recruit.hudlHandle);
-      
-      const youtubeLink = newRecruitCard.querySelector('#SAYouTubeLink');
-      youtubeLink.removeAttribute('href');
-
-      if (!recruit.youtubeHandle.startsWith("https://")) {
-        recruit.youtubeHandle = "https://" + recruit.youtubeHandle;
-      }
-
-      youtubeLink.setAttribute('href', recruit.youtubeHandle);
-      
-      const twitterLink = newRecruitCard.querySelector('#SATwitterLink');
-      const twitterHandle = recruit.twitterHandle;
-      const twitterUrl = `https://twitter.com/${twitterHandle}`;
-      twitterLink.setAttribute('href', twitterUrl);
-      
-      const instagramLink = newRecruitCard.querySelector('#SAInstagramLink');
-      const instagramHandle = recruit.instagramHandle;
-      const instagramUrl = `https://instagram.com/${instagramHandle}`;
-      instagramLink.setAttribute('href', instagramUrl);
-      
-      document.getElementById('2024recruits').appendChild(newRecruitCard);
+    // Generate and populate coach HTML blocks
+    coachData.forEach(coach => {
+      const coachHTML = generateCoachHTML(coach);
+      coachesContainer.insertAdjacentHTML('beforeend', coachHTML);
     });
 
-    // Hide the original recruitCard template
-    const originalRecruitCard = document.getElementById('recruitCard');
-    originalRecruitCard.style.display = 'none';
+    // Hide the original prepCoachBlock
+    const originalPrepCoachBlock = document.getElementById('prepCoachBlock');
+    originalPrepCoachBlock.style.display = 'none';
   })
-  .catch(error => console.error(error));
+  .catch(error => {
+    console.error('Error:', error);
+    // Display error messages or fallback content in HTML elements
+  });
 </script>
